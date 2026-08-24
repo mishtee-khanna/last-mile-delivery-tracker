@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String    @unique
+  password       String
+  role           Role      @default(CUSTOMER)
+  phone          String?
+  current_zone_id Int?
+  is_available   Boolean   @default(true)
+  ordersAsCustomer Order[]  @relation("CustomerOrders")
+  ordersAsAgent  Order[]   @relation("AgentOrders")
+  trackingActions OrderTracking[] @relation("ActorTracking")
+
+  currentZone    Zone?     @relation(fields: [current_zone_id], references: [id])
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  AGENT
+}
+
+model Zone {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  agents      User[]
+  sourceRates RateCard[] @relation("SourceZone")
+  destRates   RateCard[] @relation("DestZone")
+  pickupOrders Order[] @relation("PickupZone")
+  dropOrders  Order[]  @relation("DropZone")
+}
+
+model RateCard {
+  id             Int      @id @default(autoincrement())
+  source_zone_id Int
+  dest_zone_id   Int
+  order_type     OrderType
+  rate_per_kg    Float
+
+  sourceZone     Zone     @relation("SourceZone", fields: [source_zone_id], references: [id])
+  destZone       Zone     @relation("DestZone", fields: [dest_zone_id], references: [id])
+}
+
+model Config {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+}
+
+enum OrderType {
+  B2B
+  B2C
+}
+
+enum PaymentType {
+  PREPAID
+  COD
+}
+
+enum OrderStatus {
+  PENDING
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+}
+
+model Order {
+  id                  Int          @id @default(autoincrement())
+  customer_id         Int
+  agent_id            Int?
+  pickup_address      String
+  pickup_zone_id      Int
+  drop_address        String
+  drop_zone_id        Int
+  package_length      Float
+  package_width       Float
+  package_height      Float
+  actual_weight       Float
+  order_type          OrderType
+  payment_type        PaymentType
+  calculated_weight   Float
+  charge              Float
+  cod_surcharge_applied Float      @default(0)
+  status              OrderStatus  @default(PENDING)
+  scheduled_date      DateTime?
+  created_at          DateTime     @default(now())
+
+  customer            User         @relation("CustomerOrders", fields: [customer_id], references: [id])
+  agent               User?        @relation("AgentOrders", fields: [agent_id], references: [id])
+  pickupZone          Zone         @relation("PickupZone", fields: [pickup_zone_id], references: [id])
+  dropZone            Zone         @relation("DropZone", fields: [drop_zone_id], references: [id])
+  trackingHistory     OrderTracking[]
+}
+
+model OrderTracking {
+  id        Int          @id @default(autoincrement())
+  order_id  Int
+  status    OrderStatus
+  actor_id  Int
+  timestamp DateTime     @default(now())
+
+  order     Order        @relation(fields: [order_id], references: [id])
+  actor     User         @relation("ActorTracking", fields: [actor_id], references: [id])
+}
