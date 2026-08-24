@@ -13,10 +13,10 @@ const Login = () => {
     setError('');
     try {
       if (isRegister) {
-        await axios.post('http://localhost:5000/api/auth/register', formData);
+        await axios.post('/api/auth/register', formData);
         setIsRegister(false); // Switch to login
       } else {
-        const res = await axios.post('http://localhost:5000/api/auth/login', { email: formData.email, password: formData.password });
+        const res = await axios.post('/api/auth/login', { email: formData.email, password: formData.password });
         login(res.data);
       }
     } catch (err) {

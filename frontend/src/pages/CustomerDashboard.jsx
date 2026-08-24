@@ -12,7 +12,7 @@ const CustomerDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/customer/orders');
+      const res = await axios.get('/api/customer/orders');
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -23,7 +23,7 @@ const CustomerDashboard = () => {
 
   const handleQuote = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/api/customer/quote', formData);
+      const res = await axios.post('/api/customer/quote', formData);
       setQuote(res.data);
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to get quote');
@@ -32,7 +32,7 @@ const CustomerDashboard = () => {
 
   const handleSubmitOrder = async () => {
     try {
-      await axios.post('http://localhost:5000/api/customer/orders', formData);
+      await axios.post('/api/customer/orders', formData);
       setShowOrderForm(false);
       setQuote(null);
       fetchOrders();

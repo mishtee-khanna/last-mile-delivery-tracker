@@ -6,7 +6,7 @@ const AdminDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/orders');
+      const res = await axios.get('/api/admin/orders');
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -17,7 +17,7 @@ const AdminDashboard = () => {
 
   const triggerAutoAssign = async (id) => {
     try {
-      await axios.post(`http://localhost:5000/api/admin/orders/${id}/assign`, {});
+      await axios.post(`/api/admin/orders/${id}/assign`, {});
       fetchOrders();
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to auto-assign');

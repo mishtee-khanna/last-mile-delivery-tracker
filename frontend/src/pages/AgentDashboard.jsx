@@ -7,7 +7,7 @@ const AgentDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/agent/orders');
+      const res = await axios.get('/api/agent/orders');
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -18,7 +18,7 @@ const AgentDashboard = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`http://localhost:5000/api/agent/orders/${id}/status`, { status });
+      await axios.put(`/api/agent/orders/${id}/status`, { status });
       fetchOrders();
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to update status');
@@ -27,7 +27,7 @@ const AgentDashboard = () => {
 
   const updateLocation = async () => {
     try {
-      await axios.put('http://localhost:5000/api/agent/location', { current_zone_id: currentZoneId });
+      await axios.put('/api/agent/location', { current_zone_id: currentZoneId });
       alert("Location updated successfully.");
     } catch (err) {
       alert("Failed to update location.");
